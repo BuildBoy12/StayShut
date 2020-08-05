@@ -40,7 +40,7 @@ namespace StayShut
             while (true)
             {
                 if (!CountdownIsActive)
-                    yield return Timing.WaitForOneFrame;
+                    yield return Timing.WaitForSeconds(0.1f);
                 else
                 {
                     yield return Timing.WaitForSeconds(plugin.Config.DoorShutTime);
