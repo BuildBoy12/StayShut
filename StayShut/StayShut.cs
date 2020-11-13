@@ -1,32 +1,27 @@
-﻿using System;
-using Exiled.API.Features;
-
-namespace StayShut
+﻿namespace StayShut
 {
+    using Exiled.API.Features;
+    using ServerEvents = Exiled.Events.Handlers.Server;
+    
     public class StayShut : Plugin<Config>
     {
-        public StayShutEventHandler Handler;
-        public override string Name => nameof(StayShut);
-        public override string Author => "KoukoCocoa";
+        internal static StayShut Instance;
+        private readonly EventHandlers _eventHandlers = new EventHandlers();
 
         public override void OnEnabled()
         {
-            Handler = new StayShutEventHandler(this);
-            Exiled.Events.Handlers.Warhead.Starting += Handler.RunWhenWarheadIsActive;
-            Exiled.Events.Handlers.Warhead.Stopping += Handler.RunWhenWarheadIsStopped;
-            Exiled.Events.Handlers.Server.RoundStarted += Handler.RunWhenRoundStarts;
-            Exiled.Events.Handlers.Server.RoundEnded += Handler.RunWhenRoundEnded;
+            Instance = this;
+            ServerEvents.RoundEnded += _eventHandlers.OnRoundEnded;
+            ServerEvents.RoundStarted += _eventHandlers.OnRoundStart;
+            base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            Exiled.Events.Handlers.Server.RoundEnded -= Handler.RunWhenRoundEnded;
-            Exiled.Events.Handlers.Server.RoundStarted -= Handler.RunWhenRoundStarts;
-            Exiled.Events.Handlers.Warhead.Stopping -= Handler.RunWhenWarheadIsStopped;
-            Exiled.Events.Handlers.Warhead.Starting -= Handler.RunWhenWarheadIsActive;
-            Handler = null;
+            ServerEvents.RoundEnded -= _eventHandlers.OnRoundEnded;
+            ServerEvents.RoundStarted -= _eventHandlers.OnRoundStart;
+            Instance = null;
+            base.OnDisabled();
         }
-
-        public override void OnReloaded() { }
     }
 }
